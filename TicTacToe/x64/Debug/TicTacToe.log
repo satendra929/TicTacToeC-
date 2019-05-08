@@ -1,3 +1,3 @@
 ﻿  main.cpp
-C:\Users\satendra\source\repos\TicTacToe\TicTacToe\main.cpp(14): warning C4326: return type of 'main' should be 'int' instead of 'void'
+C:\Users\satendra\source\repos\TicTacToe\TicTacToe\main.cpp(21): warning C4326: return type of 'main' should be 'int' instead of 'void'
   TicTacToe.vcxproj -> C:\Users\satendra\source\repos\TicTacToe\x64\Debug\TicTacToe.exe
