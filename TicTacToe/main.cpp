@@ -4,15 +4,13 @@
 #include <conio.h>
 #include <Windows.h>
 
-#define KEY_UP 72
-#define KEY_DOWN 80
-#define KEY_LEFT 75
-#define KEY_RIGHT 77
+
+
 
 //Current position
 int cursor = 0;
 int blinker = 0;
-
+int activePlayer = 1;
 
 void printStatus(int* status);
 void setCursorPosition(int x, int y);
@@ -26,10 +24,11 @@ void main() {
 		status[i] = -1;
 		//prestat[i] = -1;
 	}
-	printStatus(status);
 
 	while (true) {
+
 		int result = checkWinner(status);
+
 		if (result != -1) {
 			if (result == 1) {
 				std::cout << "X wins";
@@ -40,54 +39,58 @@ void main() {
 				break;
 			}
 		}
-		//not recommended to use this
-		//system("CLS");
-		//std::cout << std::string(50,'\n');
-		char input = _getch();
 
-		switch (input)
-		{
-		case 'x':
-			status[cursor] = 1;
-			break;
-		case 'o':
-			status[cursor] = 0;
-			break;
-		//cursor cases
-		case KEY_UP:
+		if (GetKeyState('X') & 0x8000) {
+			if (activePlayer == 1) {
+				status[cursor] = 1;
+				activePlayer = 2;
+			}
+		}
+
+		if (GetKeyState('O') & 0x8000) {
+			if (activePlayer == 2) {
+				status[cursor] = 0;
+				activePlayer = 1;
+			}
+		}
+
+		if (GetKeyState(VK_UP) & 0x8000) {
 			//up
 			if (cursor > 2) {
 				cursor = cursor - 3;
 			}
-			break;
-		case KEY_DOWN:
+		}
+		
+		if (GetKeyState(VK_DOWN) & 0x8000) {
 			//down
 			if (cursor < 6) {
 				cursor = cursor + 3;
 			}
-			break;
-		case KEY_RIGHT:
-			//right
-			if (cursor < 8) {
-				cursor++;
-			}
-			break;
-		case KEY_LEFT:
+		}
+
+		if (GetKeyState(VK_LEFT) & 0x8000) {
 			//left
 			if (cursor > 0) {
 				cursor--;
 			}
-			break;
-		default:
-			break;
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(40));
+
+		if (GetKeyState(VK_RIGHT) & 0x8000) {
+			//right
+			if (cursor < 8) {
+				cursor++;
+			}
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		printStatus(status);
+		std::cout << "Turn : Player" << activePlayer << std::endl;
 	}
+	std::cin.get();
 }
 
 void printStatus(int *status) {
 	setCursorPosition(0, 0);
+	std::cout << std::endl;
 	int i;
 	int everyThree = 0;
 	for (i = 0; i < 9; i++) {
@@ -116,6 +119,7 @@ void printStatus(int *status) {
 		}
 		everyThree++;
 	}
+	std::cout << std::endl;
 }
 
 void setCursorPosition(int x, int y) {
@@ -127,31 +131,33 @@ void setCursorPosition(int x, int y) {
 
 int checkWinner(int* status) {
 	//vertical
-	int i, j;
+
+	int i;
 	for (i = 0; i < 3; i++) {
-		int temp = status[i];
-		for (j = 1; j < 3; j++) {
-			if (status[i+j*3] != temp) {
-				break;
+		if (status[i] == status[i + 3] && status[i + 3] == status[i + 6]) {
+			if (status[i] != -1) {
+				return status[i];
 			}
 		}
-		return status[i] ;
 	}
 	//horizontal
 	for (i = 0; i < 3; i++) {
-		int temp = status[i];
-		for (j = 1; j < 3; j++) {
-			if (status[i + j] != temp) {
-				break;
+		if (status[i] == status[i + 1] && status[i + 1] == status[i + 2]) {
+			if (status[i] != -1) {
+				return status[i];
 			}
 		}
 	}
 	//diagonal
 	if (status[0] == status[4] && status[4] == status[8]) {
-		return status[0];
+		if (status[0] != -1) {
+			return status[0];
+		}
 	}
 	if (status[2] == status[4] && status[4] == status[6]) {
-		return status[2];
+		if (status[2] != -1) {
+			return status[2];
+		}
 	}
 	return -1;
 }
